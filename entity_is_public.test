@@ -22,17 +22,17 @@ class EntityIsPublicTestCase extends DrupalWebTestCase {
     $node = $this->drupalCreateNode(array('type' => $node_type->type, 'status' => 1));
     $this->assertTrue(entity_is_public('node', $node));
 
-    $this->assertFalse(entity_is_public('node', $node, array('uri' => array('path' => ''))));
-    $this->assertFalse(entity_is_public('node', $node, array('uri' => array('path' => 'admin/node'))));
+    $this->assertFalse(entity_is_public('node', $node, array(), array('uri' => array('path' => ''))));
+    $this->assertFalse(entity_is_public('node', $node, array(), array('uri' => array('path' => 'admin/node'))));
     variable_set('site_frontpage', 'admin/node');
-    $this->assertTrue(entity_is_public('node', $node, array('uri' => array('path' => 'admin/node'))));
+    $this->assertTrue(entity_is_public('node', $node, array(), array('uri' => array('path' => 'admin/node'))));
 
     // Test the 'alias required' option.
-    $this->assertFalse(entity_is_public('node', $node, array(), array('alias required' => TRUE)));
+    $this->assertFalse(entity_is_public('node', $node, array('alias required' => TRUE), array()));
     $node->path['alias'] = 'test-alias';
     node_save($node);
     drupal_static_reset();
-    $this->assertTrue(entity_is_public('node', $node, array(), array('alias required' => TRUE)));
+    $this->assertTrue(entity_is_public('node', $node, array('alias required' => TRUE), array()));
 
     // Test unpublishing the node.
     $node->status = 0;
