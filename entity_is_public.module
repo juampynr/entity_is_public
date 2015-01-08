@@ -17,10 +17,10 @@ function entity_is_public_hook_info() {
  *   An entity type of $entity.
  * @param object $entity
  *   The entity object.
- * @param array $data
- *   An optional array of additional data to use when determining publicity.
  * @param array $options
  *   An optional array of options to use when determining publicity.
+ * @param array $data
+ *   An optional array of additional data to use when determining publicity.
  *
  * @return bool
  *   TRUE if the entity is publicly visible, or FALSE otherwise.
@@ -70,6 +70,15 @@ function system_entity_is_public($entity_type, $entity, array $options, array $d
 }
 
 /**
+ * Implements hook_entity_is_public() on behalf of path.module.
+ */
+function path_entity_is_public($entity_type, $entity, array $options, array $data) {
+  if (!empty($options['alias required']) && !empty($data['uri']['path'])) {
+    return (bool) drupal_lookup_path('alias', $data['uri']['path'], NULL);
+  }
+}
+
+/**
  * Implements hook_entity_is_public() on behalf of entity.module.
  */
 function entity_entity_is_public($entity_type, $entity, array $options, array $data) {
@@ -84,10 +93,47 @@ function rabbit_hole_entity_is_public($entity_type, $entity, array $options, arr
 }
 
 /**
- * Implements hook_entity_is_public() on behalf of path.module.
+ * Implements hook_entity_is_public() on behalf of page_manager.module.
+ *
+ * Checks if there is a page manager task that returns
  */
-function path_entity_is_public($entity_type, $entity, array $options, array $data) {
-  if (!empty($options['alias required']) && !empty($data['uri']['path'])) {
-    return (bool) drupal_lookup_path('alias', $data['uri']['path'], NULL);
+function page_manager_entity_is_public($entity_type, $entity, array $options, array $data) {
+  $return = $task = NULL;
+
+  switch ($entity_type) {
+    case 'taxonomy_term':
+      $task = page_manager_get_task('term_view');
+      break;
+    default:
+      $task = page_manager_get_task($entity_type . '_view');
+      break;
   }
+
+  if (!empty($task) && !$task['disabled']) {
+    ctools_include('context');
+    ctools_include('context-task-handler');
+    $args = array($entity);
+    $contexts = ctools_context_handler_get_task_contexts($task, '', $args);
+    $subtask = '';
+    $handlers = page_manager_load_sorted_handlers($task, $subtask, TRUE);
+
+    // Switch user to anonymous.
+    global $user;
+    $original_user = $user;
+    $old_state = drupal_save_session();
+    drupal_save_session(FALSE);
+    $user = drupal_anonymous_user();
+
+    if ($id = ctools_context_handler_get_render_handler($task, $subtask, $handlers, $contexts, $args)) {
+      $info = ctools_context_handler_render_handler($task, $subtask, $handlers[$id], $contexts, $args, FALSE);
+      if (!empty($info['response code']) && $info['response code'] != 200) {
+        $return = FALSE;
+      }
+    }
+
+    $user = $original_user;
+    drupal_save_session($old_state);
+  }
+
+  return $return;
 }

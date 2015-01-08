@@ -4,3 +4,4 @@ core = 7.x
 dependencies[] = entity
 files[] = entity_is_public.test
 test_dependencies[] = rabbit_hole
+test_dependencies[] = ctools
