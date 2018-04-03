@@ -95,23 +95,6 @@ unit_kernel_tests: &unit_kernel_tests
     - store_artifacts:
         path: /var/www/html/artifacts
 
-# Run Behat tests. This command invokes the test-js.sh hook.
-behat_tests: &behat_tests
-  <<: *defaults
-  steps:
-    - attach_workspace:
-        at: /var/www/html
-
-    - checkout
-
-    - run:
-        working_directory: /var/www/html
-        command: |
-          ./test-js.sh $CIRCLE_PROJECT_REPONAME
-
-    - store_artifacts:
-        path: /var/www/html/artifacts
-
 # Run code quality tests. This invokes code-sniffer.sh.
 code_sniffer: &code_sniffer
   <<: *defaults
@@ -154,8 +137,6 @@ jobs:
      <<: *update_dependencies
   run-unit-kernel-tests:
      <<: *unit_kernel_tests
-  run-behat-tests:
-     <<: *behat_tests
   run-code-sniffer:
      <<: *code_sniffer
   run-code-coverage:
@@ -169,9 +150,6 @@ workflows:
     jobs:
       - update-dependencies
       - run-unit-kernel-tests:
-          requires:
-            - update-dependencies
-      - run-behat-tests:
           requires:
             - update-dependencies
       - run-code-sniffer:
