@@ -1,7 +1,0 @@
-name = Entity is Public
-description = Provides an API for determining not only if any entity is accessible, but publicly accessible.
-core = 7.x
-dependencies[] = entity
-files[] = entity_is_public.test
-test_dependencies[] = rabbit_hole
-test_dependencies[] = ctools
