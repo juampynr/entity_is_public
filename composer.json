@@ -17,6 +17,7 @@
     "drupal/drupal-extension": "master-dev",
     "bex/behat-screenshot": "dev-master",
     "phpmd/phpmd": "dev-master",
-    "phpmetrics/phpmetrics": "dev-master"
+    "phpmetrics/phpmetrics": "dev-master",
+    "drupal/rabbit_hole": "^1.0@beta"
   }
 }
