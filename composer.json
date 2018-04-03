@@ -1,0 +1,12 @@
+{
+  "name": "drupal/entity_is_public",
+  "description": "Adds a simple API to determine if an Entity is publicly accessible or not.",
+  "type": "drupal-module",
+  "homepage": "https://drupal.org/project/entity_is_public",
+  "support": {
+    "issues": "https://drupal.org/project/issues/entity_is_public",
+    "source": "https://cgit.drupalcode.org/entity_is_public"
+  },
+  "license": "GPL-2.0+",
+  "minimum-stability": "dev"
+}
