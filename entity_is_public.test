@@ -1,47 +1,5 @@
 <?php
 
-class EntityIsPublicTestCase extends DrupalWebTestCase {
-
-  protected $profile = 'testing';
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Functional tests',
-      'description' => 'Tests for the FieldHelper class.',
-      'group' => 'Entity is Public',
-    );
-  }
-
-  public function setUp() {
-    parent::setUp(array('entity', 'entity_is_public', 'path'));
-  }
-
-  public function testNodeIsPublic() {
-    $node_type = $this->drupalCreateContentType();
-
-    $node = $this->drupalCreateNode(array('type' => $node_type->type, 'status' => 1));
-    $this->assertTrue(entity_is_public('node', $node));
-
-    $this->assertFalse(entity_is_public('node', $node, array(), array('uri' => array('path' => ''))));
-    $this->assertFalse(entity_is_public('node', $node, array(), array('uri' => array('path' => 'admin/node'))));
-    variable_set('site_frontpage', 'admin/node');
-    $this->assertTrue(entity_is_public('node', $node, array(), array('uri' => array('path' => 'admin/node'))));
-
-    // Test the 'alias required' option.
-    $this->assertFalse(entity_is_public('node', $node, array('alias required' => TRUE), array()));
-    $node->path['alias'] = 'test-alias';
-    node_save($node);
-    drupal_static_reset();
-    $this->assertTrue(entity_is_public('node', $node, array('alias required' => TRUE), array()));
-
-    // Test unpublishing the node.
-    $node->status = 0;
-    node_save($node);
-    drupal_static_reset();
-    $this->assertFalse(entity_is_public('node', $node));
-  }
-}
-
 class RabbitHoleEntityIsPublicTestCase extends DrupalWebTestCase {
 
   protected $profile = 'testing';
