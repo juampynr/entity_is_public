@@ -1,5 +1,8 @@
 <?php
 
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityMalformedException;
+
 /**
  * Implements hook_hook_info().
  */
@@ -15,7 +18,7 @@ function entity_is_public_hook_info() {
  *
  * @param string $entity_type
  *   An entity type of $entity.
- * @param object $entity
+ * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity object.
  * @param array $options
  *   An optional array of options to use when determining publicity.
@@ -25,30 +28,41 @@ function entity_is_public_hook_info() {
  * @return bool
  *   TRUE if the entity is publicly visible, or FALSE otherwise.
  */
-function entity_is_public($entity_type, $entity, array $options = array(), array $data = array()) {
-  $data += array(
-    'entity_type' => $entity_type,
-    'entity' => $entity,
-    'uri' => entity_uri($entity_type, $entity),
-  );
+function entity_is_public($entity_type, EntityInterface $entity, array $options = array(), array $data = array()) {
+  try {
+    $data += [
+      'entity_type' => $entity_type,
+      'entity' => $entity,
+      'uri' => $entity->toLink($entity->label(), 'canonical'),
+    ];
 
-  $is_public = FALSE;
+    $is_public = FALSE;
 
-  foreach (module_implements('entity_is_public') as $module) {
-    $result = module_invoke($module, 'entity_is_public', $entity_type, $entity, $options, $data);
-    if (isset($result)) {
-      $is_public = $result;
-      if (!$is_public) {
-        // Do not bother checking the rest of the implementations if something
-        // returned FALSE.
-        break;
+    $module_handler = \Drupal::moduleHandler();
+    foreach ($module_handler->getImplementations('entity_is_public') as $module) {
+      $result = $module_handler->invoke($module, 'entity_is_public', [
+        $entity_type,
+        $entity,
+        $options,
+        $data
+      ]);
+      if (isset($result)) {
+        $is_public = $result;
+        if (!$is_public) {
+          // Do not bother checking the rest of the implementations if something
+          // returned FALSE.
+          break;
+        }
       }
     }
-  }
 
-  // Allow any modules to alter the result before returning it.
-  drupal_alter('entity_is_public', $is_public, $data, $options);
-  return $is_public;
+    // Allow any modules to alter the result before returning it.
+    $module_handler->alter('entity_is_public', $is_public, $data, $options);
+    return $is_public;
+  }
+  catch (EntityMalformedException $e) {
+    return FALSE;
+  }
 }
 
 /**
@@ -59,7 +73,8 @@ function system_entity_is_public($entity_type, $entity, array $options, array $d
     // Entity must have a URI.
     return FALSE;
   }
-  if ($data['uri']['path'] == variable_get('site_frontpage', 'node')) {
+  $front_page = \Drupal::configFactory()->get('system.site') ?: 'node';
+  if ($data['uri']['path'] == $front_page) {
     // If the entity is the front page, it should be visible.
     return TRUE;
   }
