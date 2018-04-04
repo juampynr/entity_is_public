@@ -20,7 +20,10 @@ class RabbitHoleEntityIsPublicTest extends BrowserTestBase {
 
   public function testNodeIsPublic() {
     $node_type = $this->drupalCreateContentType();
-    $node = $this->drupalCreateNode(array('type' => $node_type->getEntityTypeId(), 'status' => 1));
+    $node = $this->drupalCreateNode([
+      'type' => $node_type->getEntityTypeId(),
+      'status' => 1,
+    ]);
     $this->assertTrue(entity_is_public('node', $node));
 
     $rabbit_hole_behavior = BehaviorSettings::create([
@@ -29,6 +32,7 @@ class RabbitHoleEntityIsPublicTest extends BrowserTestBase {
       'action' => 'access_denied',
       'redirect_code' => Response::HTTP_MOVED_PERMANENTLY,
     ]);
+    $rabbit_hole_behavior->save();
     $this->assertFalse(entity_is_public('node', $node));
 
     $rabbit_hole_behavior->setAction('page_not_found');
@@ -45,6 +49,7 @@ class RabbitHoleEntityIsPublicTest extends BrowserTestBase {
 
     // Allow individual node overrides.
     $rabbit_hole_behavior->setAllowOverride(TRUE);
+    $rabbit_hole_behavior->save();
 
     $node->rh_action->setValue('bundle_default');
     $node->save();

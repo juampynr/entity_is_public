@@ -131,8 +131,7 @@ function path_entity_is_public($entity_type, $entity, array $options, array $dat
  */
 function rabbit_hole_entity_is_public($entity_type, EntityInterface $entity, array $options, array $data) {
   $values = \Drupal::service('rabbit_hole.behavior_invoker')->getRabbitHoleValuesForEntity($entity);
-  throw new \Exception('incomplete method');
-  //return rabbit_hole_get_action($entity_type, $entity) == RABBIT_HOLE_DISPLAY_CONTENT;
+  return $values['rh_action'] == 'display_page';
 }
 
 /**
