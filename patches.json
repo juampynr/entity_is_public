@@ -1,0 +1,5 @@
+{
+  "drupal/rabbit_hole": {
+    "Allow access to rabbit_hole action in entities": "https://www.drupal.org/files/issues/2018-04-04/rabbit_hole-2958548-2.patch"
+  }
+}
