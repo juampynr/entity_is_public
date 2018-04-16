@@ -5,6 +5,7 @@ use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Session\AnonymousUserSession;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 /**
@@ -130,8 +131,17 @@ function path_entity_is_public($entity_type, $entity, array $options, array $dat
  * @TODO Refactor \Drupal\rabbit_hole\BehaviorInvoker::processEntity() so it provides this as part of the API.
  */
 function rabbit_hole_entity_is_public($entity_type, EntityInterface $entity, array $options, array $data) {
-  $values = \Drupal::service('rabbit_hole.behavior_invoker')->getRabbitHoleValuesForEntity($entity);
-  return $values['rh_action'] == 'display_page';
+  /** @var \Drupal\rabbit_hole\BehaviorInvoker $rabbit_hole_behavior_invoker */
+  $rabbit_hole_behavior_invoker = \Drupal::service('rabbit_hole.behavior_invoker');
+  /** @var \Symfony\Component\HttpFoundation\Response $response */
+  $response = $rabbit_hole_behavior_invoker->processEntity($entity);
+  $response_unchanged = NULL;
+  if ($response == $response_unchanged) {
+    return TRUE;
+  }
+  else {
+    return ($response->getStatusCode() >= 200) && ($response->getStatusCode() < 400);
+  }
 }
 
 /**
