@@ -25,15 +25,14 @@ class EntityIsPublicTest extends BrowserTestBase {
     ]);
     $this->assertTrue(entity_is_public('node', $node));
 
-    // @TODO not sure what this assertion is trying to prove.
-    // $this->assertFalse(entity_is_public('node', $node, [], ['uri' => ['path' => '']]));
+    // @TODO not sure what the following assertion is trying to prove.
+    //$this->assertFalse(entity_is_public('node', $node, [], ['uri' => ['path' => '']]));
     $this->assertFalse(entity_is_public('node', $node, [], ['uri' => ['path' => 'admin/node']]));
     \Drupal::configFactory()->getEditable('system.site')->set('page.front', 'admin/node')->save();
     $this->assertTrue(entity_is_public('node', $node, [], ['uri' => ['path' => 'admin/node']]));
 
     // Test the 'alias required' option.
-    // @TODO figure out how this works in Drupal 8.
-    //$this->assertFalse(entity_is_public('node', $node, ['alias required' => TRUE], []));
+    $this->assertFalse(entity_is_public('node', $node, ['alias required' => TRUE], []));
     $node = $this->drupalCreateNode([
       'type' => $node_type->getEntityTypeId(),
       'status' => 1,

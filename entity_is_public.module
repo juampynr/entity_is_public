@@ -38,7 +38,7 @@ function entity_is_public($entity_type, EntityInterface $entity, array $options 
       'entity_type' => $entity_type,
       'entity' => $entity,
       'uri' => [
-        'path' => $entity->toUrl()->toString(),
+        'path' => '/' . $entity->toUrl()->getInternalPath(),
       ],
     ];
 
@@ -120,7 +120,7 @@ function system_entity_is_public($entity_type, EntityInterface $entity, array $o
  */
 function path_entity_is_public($entity_type, $entity, array $options, array $data) {
   if (!empty($options['alias required']) && !empty($data['uri']['path'])) {
-    return (bool) \Drupal::service('path.alias_manager')->getAliasByPath($data['uri']['path']);
+    return \Drupal::service('path.alias_manager')->getAliasByPath($data['uri']['path']) != $data['uri']['path'];
   }
 }
 
