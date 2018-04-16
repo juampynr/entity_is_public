@@ -137,6 +137,9 @@ function rabbit_hole_entity_is_public($entity_type, EntityInterface $entity, arr
 /**
  * Implements hook_entity_is_public() on behalf of page_manager.module.
  *
+ * @TODO Page manager is not as relevant in Drupal 8 as it was in 7. Should
+ *       this be ported?
+ *
  * Checks if there is a page manager task that returns
  */
 function page_manager_entity_is_public($entity_type, $entity, array $options, array $data) {
