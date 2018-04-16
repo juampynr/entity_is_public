@@ -10,6 +10,7 @@
   "license": "GPL-2.0+",
   "minimum-stability": "dev",
   "require-dev": {
+    "cweagans/composer-patches": "^1.6",
     "behat/mink-selenium2-driver": "^1.3@dev",
     "behat/mink-extension": "v2.2",
     "drupal/coder": "^8.2",
